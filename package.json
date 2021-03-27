@@ -1,0 +1,77 @@
+{
+  "name": "html-entry-loader",
+  "description": "A webpack loader of using HTML file(s) as entry",
+  "version": "0.1.0",
+  "author": "Mitscherlich <mitscherlich36@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mitscherlich/html-entry-loader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mitscherlich/html-entry-loader/issues"
+  },
+  "homepage": "https://github.com/Mitscherlich/html-entry-loader#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "lib",
+    "index.js"
+  ],
+  "scripts": {
+    "start": "npm run build -- -w --source-maps",
+    "prebuild": "npm run clean",
+    "build": "babel ./src -d ./lib --copy-files",
+    "clean": "rimraf ./lib",
+    "lint": "prettier",
+    "lint:fix": "prettier --write",
+    "dev": "webpack serve --config example/webpack.config.js --progress",
+    "build:example": "rimraf example/dist && webpack --config example/webpack.config.js --progress",
+    "prepublishOnly": "npm run build -- --no-comments"
+  },
+  "dependencies": {
+    "hash-sum": "^2.0.0",
+    "html-minifier-terser": "^5.1.1",
+    "loader-utils": "^2.0.0",
+    "lodash": "^4.17.21",
+    "lru-cache": "^6.0.0",
+    "parse5": "^6.0.1",
+    "pretty-error": "^3.0.3",
+    "tapable": "^2.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
+    "babel-loader": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^5.2.0",
+    "file-loader": "^6.2.0",
+    "husky": "^5.1.3",
+    "less": "^4.1.1",
+    "less-loader": "^8.0.0",
+    "lint-staged": "^10.5.4",
+    "mini-css-extract-plugin": "^1.3.9",
+    "normalize.css": "^8.0.1",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "style-loader": "^2.0.0",
+    "url-loader": "^4.1.1",
+    "vue": "^2.6.12",
+    "vue-loader": "^15.9.6",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^5.28.0",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "peerDependencies": {
+    "webpack": "^5.0.0"
+  },
+  "husky": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js,*.ts": [
+      "prettier --write"
+    ]
+  }
+}
