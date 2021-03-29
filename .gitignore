@@ -21,4 +21,4 @@ Thumbs.db
 .vscode
 *.sublime-project
 *.sublime-workspace
-/test/fixtures/generated-2.html
+/example/dist

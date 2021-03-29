@@ -853,7 +853,7 @@ function hookIntoCompiler(compiler, options, plugin) {
     const extensionRegexp = /\.(css|js|mjs)(\?|$)/;
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
-      /** entryPointUnfilteredFiles - also includes hot module update files */
+      // entryPointUnfilteredFiles - also includes hot module update files
       const entryPointUnfilteredFiles = compilation.entrypoints
         .get(entryName)
         .getFiles();
@@ -1261,7 +1261,7 @@ function templateParametersGenerator(compilation, assets, assetTags, options) {
   return {
     compilation,
     webpackConfig: compilation.options,
-    htmlWebpackPlugin: {
+    htmlEntryPlugin: {
       tags: assetTags,
       files: assets,
       options,
@@ -1299,9 +1299,10 @@ HtmlEntryPlugin.resolve = (pattern, options) => {
     pattern = pattern.join(',');
   }
 
-  return glob.sync(pattern).reduce((entryMap, fullpath) => {
-    let { dir: dirname, name: filename } = path.parse(fullpath);
-    if (path.isAbsolute(fullpath)) {
+  return glob.sync(pattern).reduce((entryMap, filename) => {
+    const fullpath = filename;
+    let { dir: dirname, name: entryName } = path.parse(filename);
+    if (path.isAbsolute(filename)) {
       dirname = path.relative(context, dirname);
     }
 
@@ -1309,7 +1310,7 @@ HtmlEntryPlugin.resolve = (pattern, options) => {
       dirname = dirname.replace(/\/\//g, '/');
     }
 
-    let entryName = `${dirname}/${filename}`;
+    entryName = dirname ? `${dirname}/${entryName}` : entryName;
 
     if (entryName.startsWith('/')) {
       entryName = entryName.slice(1);

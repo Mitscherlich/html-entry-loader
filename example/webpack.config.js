@@ -1,7 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const HtmlEntryPlugin = require('../lib/plugin');
+const { VueLoaderPlugin } = require('vue-loader');
+const { HtmlEntryPlugin } = require('html-entry-loader');
 
 const r = (...paths) => path.resolve(__dirname, ...paths);
 
@@ -58,7 +58,6 @@ module.exports = {
   plugins: [
     new VueLoaderPlugin(),
     new HtmlEntryPlugin({
-      filename: 'html/[name].html',
       context: r('.'),
       sources: {
         urlFilter: (url) => !/\/vendor\//.test(url),

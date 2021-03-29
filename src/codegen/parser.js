@@ -3,7 +3,12 @@ import hash from 'hash-sum';
 import LRUCache from 'lru-cache';
 import { traverse, requestify, getFilter } from '../utils';
 
-const cache = new LRUCache(100);
+const CACHE_SIZE_ENV =
+  process.env.HTML_ENTRY_LOADER_CACHE_SIZE ||
+  process.env.npm_config_html_entry_loader_cache_size;
+const CACHE_SIZE = parseInt(CACHE_SIZE_ENV || 100);
+
+const cache = new LRUCache(CACHE_SIZE);
 
 const webpackIgnoreCommentRegexp = /webpackIgnore:(\s+)?(true|false)/;
 

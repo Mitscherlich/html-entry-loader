@@ -1,5 +1,3 @@
-import _PrettyError from 'pretty-error';
-
 function getIndices(value) {
   const result = [];
   let index = value.indexOf('\n');
@@ -55,7 +53,7 @@ export class HtmlSourceError extends Error {
   }
 }
 
-const prettyError = new _PrettyError();
+const prettyError = new (require('pretty-error'))();
 prettyError.withoutColors();
 prettyError.skipPackage('html-plugin-evaluation');
 prettyError.skipNodeFiles();
