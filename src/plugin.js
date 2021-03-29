@@ -1226,7 +1226,7 @@ function hookIntoCompiler(compiler, options, plugin) {
           'If you are not generating a valid html output please disable it manually.\n' +
           'You can do so by adding the following setting to your HtmlEntryPlugin config:\n|\n|' +
           '    minify: false\n|\n' +
-          'See https://github.com/Mitscherlich/html-entry-loader#plugin-options for details.\n\n' +
+          'See https://github.com/Mitscherlich/html-entry-loader#options for details.\n\n' +
           'For parser dedicated bugs please create an issue here:\n' +
           'https://danielruf.github.io/html-minifier-terser/' +
           '\n' +

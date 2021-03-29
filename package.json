@@ -75,5 +75,8 @@
     "*.js,*.ts": [
       "prettier --write"
     ]
+  },
+  "engines": {
+    "node": "10.13.0"
   }
 }
