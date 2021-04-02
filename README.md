@@ -347,5 +347,5 @@ To disable minification during production mode set the `minify` option to `false
 [npm-url]: https://npmjs.com/package/html-entry-loader
 [node]: https://img.shields.io/node/v/html-entry-loader.svg
 [node-url]: https://nodejs.org
-[deps]: https://david-dm.org/jantimon/html-entry-loader.svg
-[deps-url]: https://david-dm.org/jantimon/html-entry-loader
+[deps]: https://david-dm.org/Mitscherlich/html-entry-loader.svg
+[deps-url]: https://david-dm.org/Mitscherlich/html-entry-loader
