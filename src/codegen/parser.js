@@ -1,4 +1,4 @@
-import { parse, serialize } from 'parse5';
+import { parse, parseFragment, serialize } from 'parse5';
 import hash from 'hash-sum';
 import LRUCache from 'lru-cache';
 import { traverse, requestify, getFilter } from '../utils';
@@ -11,6 +11,13 @@ const CACHE_SIZE = parseInt(CACHE_SIZE_ENV || 100);
 const cache = new LRUCache(CACHE_SIZE);
 
 const webpackIgnoreCommentRegexp = /webpackIgnore:(\s+)?(true|false)/;
+
+function parseHTML(html, options) {
+  if (html.indexOf('<html>') >= 0) {
+    return parse(html, options);
+  }
+  return parseFragment(html, options);
+}
 
 export async function compile({
   source: html,
@@ -32,7 +39,7 @@ export async function compile({
   };
 
   const urlFilter = getFilter(sources.urlFilter);
-  const document = parse(html, { sourceCodeLocationInfo: true });
+  const document = parseHTML(html, { sourceCodeLocationInfo: true });
 
   let needIgnore = false;
 

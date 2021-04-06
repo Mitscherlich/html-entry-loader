@@ -773,7 +773,7 @@ function hookIntoCompiler(compiler, options, plugin) {
         : // If no public path was set get a relative url path
           path
             .normalize(
-              resolve(
+              path.resolve(
                 compilation.options.output.path,
                 dirname(childCompilationOutputName)
               ),
