@@ -13,7 +13,7 @@ const cache = new LRUCache(CACHE_SIZE);
 const webpackIgnoreCommentRegexp = /webpackIgnore:(\s+)?(true|false)/;
 
 function parseHTML(html, options) {
-  if (html.indexOf('<html>') >= 0) {
+  if (/(<html[^>]*>)/i.test(html)) {
     return parse(html, options);
   }
   return parseFragment(html, options);

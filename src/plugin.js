@@ -1104,11 +1104,12 @@ function hookIntoCompiler(compiler, options, plugin) {
     }
 
     if (head.length) {
-      // Create a head tag if none exists
       if (!headRegExp.test(html)) {
         if (!htmlRegExp.test(html)) {
-          html = `<head></head>${html}`;
+          // Don't create head tag if `<html>` and `<head>` are both missing
+          html = `${head.join('')}${html}`;
         } else {
+          // Create a head tag if none exists
           html = html.replace(htmlRegExp, (match) => `${match}<head></head>`);
         }
       }
