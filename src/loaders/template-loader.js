@@ -35,8 +35,6 @@ module.exports = async function (source) {
   // Use __non_webpack_require__ to enforce using the native nodejs require
   // during template execution
   return `var _ = __non_webpack_require__(${JSON.stringify(lodashRequire)});
-module.exports = function(templateParams) { with (templateParams) {
-  // Execute the lodash template
-  return (${template.source})();
-}}`;
+// Execute the lodash template
+module.exports = (${template.source})();`;
 };

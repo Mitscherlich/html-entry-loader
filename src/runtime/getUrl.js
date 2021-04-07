@@ -1,4 +1,4 @@
-module.exports = (url, options) => {
+module.exports = function (url, options) {
   if (!options) {
     options = {};
   }

@@ -69,7 +69,6 @@ class HtmlEntryPlugin {
       // Default options
       /** @type {ProcessedHtmlEntryPluginOptions} */
       const defaultOptions = {
-        templateParameters: templateParametersGenerator,
         filename: '[name].html',
         publicPath: 'auto',
         context: compiler.context,
@@ -399,11 +398,7 @@ function hookIntoCompiler(compiler, options, plugin) {
                 assetTags: {
                   scripts: generatedScriptTags(assets.js),
                   styles: generateStyleTags(assets.css),
-                  meta: [
-                    ...generateBaseTag(options.base),
-                    ...generatedMetaTags(options.meta),
-                    ...generateFaviconTags(assets.favicon),
-                  ],
+                  meta: [...generatedMetaTags(options.meta)],
                 },
                 outputName: options.filename,
                 publicPath: htmlPublicPath,
@@ -456,22 +451,10 @@ function hookIntoCompiler(compiler, options, plugin) {
           });
           // Execute the template
           const templateExecutionPromise = Promise.all([
+            templateEvaluationPromise,
             assetsPromise,
             assetTagGroupsPromise,
-            templateEvaluationPromise,
-          ]).then(([assetsHookResult, assetTags, compilationResult]) =>
-            typeof compilationResult !== 'function'
-              ? compilationResult
-              : executeTemplate(
-                  compilationResult,
-                  assetsHookResult.assets,
-                  {
-                    headTags: assetTags.headTags,
-                    bodyTags: assetTags.bodyTags,
-                  },
-                  compilation
-                )
-          );
+          ]).then(([compilationResult]) => compilationResult);
 
           const injectedHtmlPromise = Promise.all([
             assetTagGroupsPromise,
@@ -560,98 +543,6 @@ function hookIntoCompiler(compiler, options, plugin) {
       );
     }
   );
-
-  /**
-   * Generate the template parameters for the template function
-   * @param {WebpackCompilation} compilation
-   * @param {{
-   *   publicPath: string,
-   *   js: Array<string>,
-   *   css: Array<string>,
-   *   manifest?: string,
-   *   favicon?: string
-   * }} assets
-   * @param {{
-   *   headTags: HtmlTagObject[],
-   *   bodyTags: HtmlTagObject[]
-   * }} assetTags
-   * @returns {Promise<{[key: any]: any}>}
-   */
-  function getTemplateParameters(compilation, assets, assetTags) {
-    const templateParameters = options.templateParameters;
-    if (templateParameters === false) {
-      return Promise.resolve({});
-    }
-    if (
-      typeof templateParameters !== 'function' &&
-      typeof templateParameters !== 'object'
-    ) {
-      throw new Error(
-        'templateParameters has to be either a function or an object'
-      );
-    }
-    const templateParameterFunction =
-      typeof templateParameters === 'function'
-        ? // A custom function can overwrite the entire template parameter preparation
-          templateParameters
-        : // If the template parameters is an object merge it with the default values
-          (compilation, assets, assetTags, options) =>
-            Object.assign(
-              {},
-              templateParametersGenerator(
-                compilation,
-                assets,
-                assetTags,
-                options
-              ),
-              templateParameters
-            );
-    const preparedAssetTags = {
-      headTags: prepareAssetTagGroupForRendering(assetTags.headTags),
-      bodyTags: prepareAssetTagGroupForRendering(assetTags.bodyTags),
-    };
-    return Promise.resolve().then(() =>
-      templateParameterFunction(compilation, assets, preparedAssetTags, options)
-    );
-  }
-
-  /**
-   * This function renders the actual html by executing the template function
-   *
-   * @param {(templateParameters) => string | Promise<string>} templateFunction
-   * @param {{
-   *   publicPath: string,
-   *   js: Array<string>,
-   *   css: Array<string>,
-   *   manifest?: string,
-   *   favicon?: string
-   * }} assets
-   * @param {{
-   *   headTags: HtmlTagObject[],
-   *   bodyTags: HtmlTagObject[]
-   * }} assetTags
-   * @param {WebpackCompilation} compilation
-   *
-   * @returns {Promise<string>}
-   */
-  function executeTemplate(templateFunction, assets, assetTags, compilation) {
-    // Template processing
-    const templateParamsPromise = getTemplateParameters(
-      compilation,
-      assets,
-      assetTags
-    );
-    return templateParamsPromise.then((templateParams) => {
-      try {
-        // If html is a promise return the promise
-        // If html is a string turn it into a promise
-        return templateFunction(templateParams);
-      } catch (e) {
-        compilation.errors.push(new Error('Template execution failed: ' + e));
-        return Promise.reject(e);
-      }
-    });
-  }
 
   /**
    * Html Post processing
@@ -813,8 +704,6 @@ function hookIntoCompiler(compiler, options, plugin) {
    *   publicPath: string,
    *   js: Array<string>,
    *   css: Array<string>,
-   *   manifest?: string,
-   *   favicon?: string
    * }}
    */
   function getHtmlEntryPluginAssets(compilation, entryNames, publicPath) {
@@ -824,8 +713,6 @@ function hookIntoCompiler(compiler, options, plugin) {
      *    publicPath: string,
      *    js: Array<string>,
      *    css: Array<string>,
-     *    manifest?: string,
-     *    favicon?: string
      *  }}
      */
     const assets = {
@@ -835,18 +722,7 @@ function hookIntoCompiler(compiler, options, plugin) {
       js: [],
       // Will contain all css files
       css: [],
-      // Will contain the html5 appcache manifest files if it exists
-      manifest: Object.keys(compilation.assets).find(
-        (assetFile) => path.extname(assetFile) === '.appcache'
-      ),
-      // Favicon
-      favicon: undefined,
     };
-
-    // Append a hash for cache busting
-    if (options.hash && assets.manifest) {
-      assets.manifest = appendHash(assets.manifest, compilationHash);
-    }
 
     // Extract paths to .js, .mjs and .css files from the current compilation
     const entryPointPublicPathMap = {};
@@ -936,30 +812,6 @@ function hookIntoCompiler(compiler, options, plugin) {
   }
 
   /**
-   * Generate an optional base tag
-   * @param { false
-   *        | string
-   *        | {[attributeName: string]: string} // attributes e.g. { href:"http://example.com/page.html" target:"_blank" }
-   *        } baseOption
-   * @returns {Array<HtmlTagObject>}
-   */
-  function generateBaseTag(baseOption) {
-    if (baseOption === false) {
-      return [];
-    } else {
-      return [
-        {
-          tagName: 'base',
-          voidTag: true,
-          meta: { plugin: 'HtmlEntryPlugin' },
-          attributes:
-            typeof baseOption === 'string' ? { href: baseOption } : baseOption,
-        },
-      ];
-    }
-  }
-
-  /**
    * Generate all meta tags for the given meta configuration
    * @param {
    *  {
@@ -1005,28 +857,6 @@ function hookIntoCompiler(compiler, options, plugin) {
   }
 
   /**
-   * Generate a favicon tag for the given file path
-   * @param {string| undefined} faviconPath
-   * @returns {Array<HtmlTagObject>}
-   */
-  function generateFaviconTags(faviconPath) {
-    if (!faviconPath) {
-      return [];
-    }
-    return [
-      {
-        tagName: 'link',
-        voidTag: true,
-        meta: { plugin: 'HtmlEntryPlugin' },
-        attributes: {
-          rel: 'icon',
-          href: faviconPath,
-        },
-      },
-    ];
-  }
-
-  /**
    * Group assets to head and bottom tags
    *
    * @param {{
@@ -1046,26 +876,6 @@ function hookIntoCompiler(compiler, options, plugin) {
       headTags: [...assetTags.meta, ...assetTags.styles],
       bodyTags: [...assetTags.scripts],
     };
-  }
-
-  /**
-   * Add toString methods for easier rendering
-   * inside the template
-   *
-   * @param {Array<HtmlTagObject>} assetTagGroup
-   * @returns {Array<HtmlTagObject>}
-   */
-  function prepareAssetTagGroupForRendering(assetTagGroup) {
-    const xhtml = options.xhtml;
-    return HtmlTagArray.from(
-      assetTagGroup.map((assetTag) => {
-        const copiedAssetTag = Object.assign({}, assetTag);
-        copiedAssetTag.toString = function () {
-          return htmlTagObjectToString(this, xhtml);
-        };
-        return copiedAssetTag;
-      })
-    );
   }
 
   /**
@@ -1118,16 +928,6 @@ function hookIntoCompiler(compiler, options, plugin) {
       html = html.replace(headRegExp, (match) => head.join('') + match);
     }
 
-    // Inject manifest into the opening html tag
-    if (assets.manifest) {
-      html = html.replace(/(<html[^>]*)(>)/i, (match, start, end) => {
-        // Append the manifest only if no manifest was specified
-        if (/\smanifest\s*=/.test(match)) {
-          return match;
-        }
-        return `${start} manifest="${assets.manifest}"${end}`;
-      });
-    }
     return html;
   }
 
@@ -1236,38 +1036,6 @@ function hookIntoCompiler(compiler, options, plugin) {
       throw e;
     }
   }
-}
-
-/**
- * The default for options.templateParameter
- * Generate the template parameters
- *
- * Generate the template parameters for the template function
- * @param {WebpackCompilation} compilation
- * @param {{
- *   publicPath: string,
- *   js: Array<string>,
- *   css: Array<string>,
- *   manifest?: string,
- *   favicon?: string
- * }} assets
- * @param {{
- *   headTags: HtmlTagObject[],
- *   bodyTags: HtmlTagObject[]
- * }} assetTags
- * @param {ProcessedHtmlWebpackOptions} options
- * @returns {TemplateParameter}
- */
-function templateParametersGenerator(compilation, assets, assetTags, options) {
-  return {
-    compilation,
-    webpackConfig: compilation.options,
-    htmlEntryPlugin: {
-      tags: assetTags,
-      files: assets,
-      options,
-    },
-  };
 }
 
 HtmlEntryPlugin.NS = NS;

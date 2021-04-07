@@ -230,7 +230,7 @@ function srcType(options) {
   return [{ value: source.value, startOffset, endOffset }];
 }
 
-function linkHrefFilter(tag, attribute, attributes) {
+function linkHrefFilter(_tag, _attribute, attributes) {
   let rel = getAttributeValue(attributes, 'rel');
 
   if (!rel) {
@@ -261,7 +261,7 @@ function linkHrefFilter(tag, attribute, attributes) {
   return allowedRels.filter((value) => usedRels.includes(value)).length > 0;
 }
 
-function scriptSrcFilter(tag, attribute, attributes) {
+function scriptSrcFilter(_tag, _attribute, attributes) {
   let type = getAttributeValue(attributes, 'type');
 
   if (!type) {
