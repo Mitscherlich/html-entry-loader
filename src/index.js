@@ -56,7 +56,6 @@ const templateLoaderPath = require.resolve('./loaders/template-loader');
 
 module.exports.pitch = function () {
   const options = getOptions(this);
-  const { cacheDirectory, cacheIdentifier, type } = options;
 
   let loaders = this.loaders;
 
@@ -90,28 +89,11 @@ module.exports.pitch = function () {
     );
   };
 
-  if (type === 'template') {
-    const cacheLoader =
-      cacheDirectory && cacheIdentifier
-        ? [
-            `${require.resolve('cache-loader')}?${qs.stringify({
-              // For some reason, webpack fails to generate consistent hash if we
-              // use absolute paths here, even though the path is only used in a
-              // comment. For now we have to ensure cacheDirectory is a relative path.
-              cacheDirectory: (isAbsolute(cacheDirectory)
-                ? relative(process.cwd(), cacheDirectory)
-                : cacheDirectory
-              ).replace(/\\/g, '/'),
-              cacheIdentifier: `${hash(cacheIdentifier)}-html-template`,
-            })}`,
-          ]
-        : [];
-
+  if (options.type === 'template') {
     const preLoaders = loaders.filter(isPreLoader);
     const postLoaders = loaders.filter(isPostLoader);
 
     const request = genRequest([
-      ...cacheLoader,
       ...postLoaders,
       `${templateLoaderPath}??html-entry-options`,
       ...preLoaders,
