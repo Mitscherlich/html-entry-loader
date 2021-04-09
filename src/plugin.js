@@ -275,8 +275,13 @@ function hookIntoCompiler(compiler, options, plugin) {
    * @type {Array<{html: string, name: string}>}
    */
   let previousEmittedAssets = [];
+  let previousCompilationHash = Date.now();
 
-  options.template = getFullTemplatePath(options.template, options.context);
+  options.template = getFullTemplatePath(
+    options.template,
+    options.context,
+    previousCompilationHash
+  );
 
   // Inject child compiler plugin
   const childCompilerPlugin = new CachedChildCompilation(compiler);
@@ -340,6 +345,9 @@ function hookIntoCompiler(compiler, options, plugin) {
               new PrettyError(templateResult.error, compiler.context).toString()
             );
           }
+
+          // Record last compilation's hash
+          previousCompilationHash = compilation.hash;
 
           // If the child compilation was not executed during a previous main compile run
           // it is a cached result
@@ -985,13 +993,12 @@ function hookIntoCompiler(compiler, options, plugin) {
    * @param {string} template The path to the template e.g. './index.html'
    * @param {string} context The webpack base resolution path for relative paths e.g. process.cwd()
    */
-  function getFullTemplatePath(template, context) {
+  function getFullTemplatePath(template, context, compilationHash) {
     // If the template doesn't use a loader use the template loader
     if (template.indexOf('!') === -1) {
       template = `${require.resolve('html-entry-loader')}?${qs.stringify({
         type: 'template',
-        cacheDirectory: options.cacheDirectory,
-        cacheIdentifier: options.cacheIdentifier,
+        cacheIdentifier: compilationHash,
       })}!${path.resolve(context, template)}`;
     }
     // Resolve template path

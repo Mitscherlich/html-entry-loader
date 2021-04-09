@@ -24,8 +24,10 @@ export async function compile({
   sources,
   context,
   resourcePath,
+  resourceQuery,
+  hash: cacheIdentifier,
 }) {
-  const cacheKey = hash(html);
+  const cacheKey = hash({ resourcePath, resourceQuery, cacheIdentifier });
 
   if (cache.has(cacheKey)) {
     return cache.get(cacheKey);

@@ -16,6 +16,7 @@ module.exports = async function (source) {
     sources: options.sources,
     resourcePath,
     context,
+    hash: options.cacheIdentifier,
   });
 
   for (const error of descriptor.errors) {

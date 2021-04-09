@@ -28,13 +28,15 @@ module.exports = async function (source) {
   const rawOptions = loaderContext.getOptions(schema);
   const options = normalizeOptions(rawOptions);
 
-  const { resourcePath, context } = loaderContext;
+  const { resourcePath, resourceQuery, context } = loaderContext;
 
   const descriptor = await compile({
     source,
     sources: options.sources,
     resourcePath,
+    resourceQuery,
     context,
+    hash: options.cacheIdentifier,
   });
 
   for (const error of descriptor.errors) {
