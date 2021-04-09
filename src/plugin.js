@@ -155,7 +155,7 @@ class HtmlEntryPlugin {
 
     if (!htmlRules.length) {
       throw new Error(
-        '[HtmlEntryPlugin Error] No matching rule for .vue files found.\n' +
+        '[HtmlEntryPlugin Error] No matching rule for .html files found.\n' +
           'Make sure there is at least one root-level rule that matches .html files.'
       );
     }
@@ -167,7 +167,7 @@ class HtmlEntryPlugin {
 
     // get html-entry-loader options
     const htmlEntryLoaderUseIndex = htmlUse.findIndex((u) => {
-      return /^html-entry-loader/.test(u.loader);
+      return /^html-entry-loader|(\/|\\|@)html-entry-loader/.test(u.loader);
     });
 
     if (htmlEntryLoaderUseIndex < 0) {
