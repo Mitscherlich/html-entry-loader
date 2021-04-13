@@ -465,7 +465,10 @@ export function genModuleCode({ html, replacements }) {
   return `// Module\n${replacersCode}var code = ${code};\n`;
 }
 
-export function genExportCode() {
+export function genExportCode({ html } = {}) {
+  if (html) {
+    return `// Exports\nmodule.exports = ${JSON.stringify(html)};`;
+  }
   return `// Exports\nmodule.exports = code;`;
 }
 

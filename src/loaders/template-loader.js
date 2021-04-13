@@ -1,5 +1,5 @@
 import { compile } from '../codegen/parser';
-import { normalizeOptions } from '../utils';
+import { normalizeOptions, genExportCode } from '../utils';
 
 import schema from '../options.json';
 
@@ -20,8 +20,8 @@ module.exports = async function (source) {
   });
 
   for (const error of descriptor.errors) {
-    loaderContext.emit(error instanceof Error ? error : new Error(error));
+    loaderContext.emitError(error instanceof Error ? error : new Error(error));
   }
 
-  return `module.exports = ${JSON.stringify(descriptor.html)}`;
+  return genExportCode(descriptor);
 };
