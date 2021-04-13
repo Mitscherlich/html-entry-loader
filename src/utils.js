@@ -399,7 +399,7 @@ export function getFilter(filter) {
   };
 }
 
-const GET_SOURCE_FROM_IMPORT_NAME = '___HEL_GET_SOURCE_FROM_IMPORT___';
+const GET_SOURCE_FROM_IMPORT_NAME = '___HTML_ENTRY_GET_SOURCE_FROM_IMPORT___';
 
 export function genImportCode({ imports }, loaderContext) {
   if (imports.length === 0) {
