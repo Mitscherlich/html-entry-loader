@@ -1,10 +1,15 @@
 # Changelogs
 
+## v0.1.5 (2021-04-14)
+
+- feat: allow user add chunks should be injected.
+- feat: use helper function for template export code.
+
 ## v0.1.4 (2021-04-09)
 
 - pref: emit resolved html content instead of lodash template function.
 - fix: allow full html-entry-loader resolved path in webpack use.
-- pref: use comilation as cache identifier.
+- pref: use compilation as cache identifier.
 
 ## v0.1.3 (2021-04-07)
 
