@@ -1,14 +1,5 @@
 import { parse, parseFragment, serialize } from 'parse5';
-import hash from 'hash-sum';
-import LRUCache from 'lru-cache';
 import { traverse, requestify, getFilter } from '../utils';
-
-const HTML_ENTRY_CACHE_SIZE =
-  process.env.HTML_ENTRY_CACHE_SIZE ||
-  process.env.npm_config_html_entry_cache_size ||
-  process.env.npm_package_html_entry_cache_size;
-
-const cache = new LRUCache(parseInt(HTML_ENTRY_CACHE_SIZE || 100));
 
 const webpackIgnoreCommentRegexp = /webpackIgnore:(\s+)?(true|false)/;
 
@@ -24,15 +15,7 @@ export async function compile({
   sources,
   context,
   resourcePath,
-  resourceQuery,
-  hash: cacheIdentifier,
 }) {
-  const cacheKey = hash({ resourcePath, resourceQuery, cacheIdentifier });
-
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey);
-  }
-
   const descriptor = {
     imports: [],
     replacements: [],
@@ -198,7 +181,7 @@ export async function compile({
     let replacementName = replacements.get(replacementKey);
 
     if (!replacementName) {
-      replacementName = `___HTML_LOADER_REPLACEMENT_${replacements.size}___`;
+      replacementName = `___HTML_ENTRY_LOADER_REPLACEMENT_${replacements.size}___`;
       replacements.set(replacementKey, replacementName);
 
       descriptor.replacements.push({
@@ -219,10 +202,6 @@ export async function compile({
   }
 
   descriptor.html = serialize(document);
-
-  if (!cache.has(cacheKey)) {
-    cache.set(cacheKey, descriptor);
-  }
 
   return descriptor;
 }

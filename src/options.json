@@ -1,5 +1,5 @@
 {
-  "title": "HTML Entry Loader options",
+  "title": "html-entry-loader options",
   "type": "object",
   "definitions": {
     "Source": {

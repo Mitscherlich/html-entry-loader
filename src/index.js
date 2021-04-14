@@ -1,7 +1,4 @@
-import qs from 'querystring';
-import hash from 'hash-sum';
 import { getOptions, stringifyRequest } from 'loader-utils';
-import { isAbsolute, relative } from 'path';
 import { compile } from './codegen/parser';
 import {
   normalizeOptions,
@@ -25,6 +22,10 @@ module.exports = async function (source) {
     errorEmitted = true;
   }
 
+  if (loaderContext.cacheable) {
+    loaderContext.cacheable(true);
+  }
+
   const rawOptions = loaderContext.getOptions(schema);
   const options = normalizeOptions(rawOptions);
 
@@ -32,11 +33,10 @@ module.exports = async function (source) {
 
   const descriptor = await compile({
     source,
-    sources: options.sources,
     resourcePath,
     resourceQuery,
     context,
-    hash: options.cacheIdentifier,
+    ...options,
   });
 
   for (const error of descriptor.errors) {

@@ -22,11 +22,7 @@ import { getCompilationHooks } from 'webpack/lib/NormalModule';
 import { CachedChildCompilation } from './child-compiler';
 import { PrettyError } from './errors';
 import { getHtmlEntryPluginHooks } from './hooks';
-import {
-  createHtmlTagObject,
-  htmlTagObjectToString,
-  HtmlTagArray,
-} from './html-tag';
+import { createHtmlTagObject, htmlTagObjectToString } from './html-tag';
 import { isProductionLike } from './utils';
 import { version } from '../package.json';
 
@@ -78,6 +74,7 @@ class HtmlEntryPlugin {
         minify: 'auto',
         cache: true,
         showErrors: true,
+        chunks: [],
         meta: {},
         base: false,
       };
@@ -102,11 +99,17 @@ class HtmlEntryPlugin {
         ])
       );
 
+      // List all chunks should be inject
+      const userIncludeChunks = options.chunks;
+      const includeChunks = Array.isArray(userIncludeChunks)
+        ? userIncludeChunks
+        : [userIncludeChunks];
+
       const entryOptions = Array.from(outputFilenames.entries()).map(
         ([entryName, filename]) => ({
           ...options,
           template: `${entryName}.html`,
-          chunks: [entryName],
+          chunks: [entryName, ...includeChunks],
           filename,
         })
       );
@@ -186,8 +189,6 @@ class HtmlEntryPlugin {
       htmlEntryLoaderUse.options || {},
       {
         sources: this.userOptions.sources,
-        cacheDirectory: this.userOptions.cacheDirectory,
-        cacheIdentifier: this.userOptions.cacheIdentifier,
       }
     );
 

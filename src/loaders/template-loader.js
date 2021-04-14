@@ -6,6 +6,10 @@ import schema from '../options.json';
 module.exports = async function (source) {
   const loaderContext = this;
 
+  if (loaderContext.cacheable) {
+    loaderContext.cacheable(true);
+  }
+
   const rawOptions = loaderContext.getOptions(schema);
   const options = normalizeOptions(rawOptions);
 
@@ -13,10 +17,9 @@ module.exports = async function (source) {
 
   const descriptor = await compile({
     source,
-    sources: options.sources,
     resourcePath,
     context,
-    hash: options.cacheIdentifier,
+    ...options,
   });
 
   for (const error of descriptor.errors) {

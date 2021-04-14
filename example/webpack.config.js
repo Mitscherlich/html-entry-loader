@@ -41,6 +41,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           name: 'images/[name].[contenthash:8].[ext]',
+          esModule: false,
         },
       },
     ],
@@ -59,9 +60,6 @@ module.exports = {
     new VueLoaderPlugin(),
     new HtmlEntryPlugin({
       context: r('.'),
-      sources: {
-        urlFilter: (url) => !/\/vendor\//.test(url),
-      },
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash:8].css',

@@ -60,13 +60,9 @@ declare namespace HtmlEntryPlugin {
      */
     cache: boolean;
     /**
-     * The cache directory for cache-loader
+     * List all entries which should be injected
      */
-    cacheDirectory: string;
-    /**
-     * The cache identifier for cache-loader
-     */
-    cacheIdentifier: string;
+    chunks: '[name]' | string[];
     /**
      * The file to write the HTML to.
      * Supports subdirectories eg: `html/[name].html`
