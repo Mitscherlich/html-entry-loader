@@ -1,5 +1,6 @@
 import { parse, parseFragment, serialize } from 'parse5';
 import { traverse, requestify, getFilter } from '../utils';
+import { cache } from './cache';
 
 const webpackIgnoreCommentRegexp = /webpackIgnore:(\s+)?(true|false)/;
 
@@ -10,12 +11,7 @@ function parseHTML(html, options) {
   return parseFragment(html, options);
 }
 
-export async function compile({
-  source: html,
-  sources,
-  context,
-  resourcePath,
-}) {
+export function transform(html, { sources, context, resourcePath }) {
   const descriptor = {
     imports: [],
     replacements: [],
@@ -147,7 +143,6 @@ export async function compile({
 
   for (const source of descriptor.sources) {
     const {
-      name,
       value,
       isValueQuoted,
       format,
@@ -204,4 +199,26 @@ export async function compile({
   descriptor.html = serialize(document);
 
   return descriptor;
+}
+
+export async function compile({
+  source,
+  cacheDirectory,
+  cacheIdentifier,
+  ...options
+}) {
+  let result;
+  if (cacheDirectory) {
+    result = await cache({
+      source,
+      options,
+      transform,
+      cacheDirectory,
+      cacheIdentifier,
+    });
+  } else {
+    result = await transform(source, options);
+  }
+
+  return result;
 }

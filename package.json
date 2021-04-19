@@ -30,6 +30,7 @@
     "prepublishOnly": "npm run build -- --no-comments"
   },
   "dependencies": {
+    "fs-extra": "^9.1.0",
     "hash-sum": "^2.0.0",
     "html-minifier-terser": "^5.1.1",
     "loader-utils": "^2.0.0",

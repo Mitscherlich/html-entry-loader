@@ -386,6 +386,9 @@ function getSourcesOptions(rawOptions) {
 export function normalizeOptions(rawOptions) {
   return {
     sources: getSourcesOptions(rawOptions),
+    // apply cache option if exist
+    cacheDirectory: rawOptions.cacheDirectory,
+    cacheIdentifier: rawOptions.cacheIdentifier,
   };
 }
 

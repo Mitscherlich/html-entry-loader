@@ -189,6 +189,8 @@ class HtmlEntryPlugin {
       htmlEntryLoaderUse.options || {},
       {
         sources: this.userOptions.sources,
+        cacheDirectory: this.userOptions.cacheDirectory,
+        cacheIdentifier: this.userOptions.cacheIdentifier,
       }
     );
 
@@ -994,12 +996,13 @@ function hookIntoCompiler(compiler, options, plugin) {
    * @param {string} template The path to the template e.g. './index.html'
    * @param {string} context The webpack base resolution path for relative paths e.g. process.cwd()
    */
-  function getFullTemplatePath(template, context, compilationHash) {
+  function getFullTemplatePath(template, context) {
     // If the template doesn't use a loader use the template loader
     if (template.indexOf('!') === -1) {
       template = `${require.resolve('html-entry-loader')}?${qs.stringify({
         type: 'template',
-        cacheIdentifier: compilationHash,
+        cacheDirectory: options.cacheDirectory,
+        cacheIdentifier: options.cacheIdentifier,
       })}!${path.resolve(context, template)}`;
     }
     // Resolve template path

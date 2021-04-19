@@ -57,6 +57,12 @@
         }
       ]
     },
+    "cacheDirectory": {
+      "type": "string"
+    },
+    "cacheIdentifier": {
+      "type": "string"
+    },
     "additionalProperties": false
   }
 }
