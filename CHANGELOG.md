@@ -1,5 +1,9 @@
 # Changelogs
 
+## v0.1.6 (2021-04-19)
+
+- feat: support hard-source file(s) cache.
+
 ## v0.1.5 (2021-04-14)
 
 - feat: allow user add chunks should be injected.
