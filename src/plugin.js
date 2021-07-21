@@ -303,17 +303,22 @@ function hookIntoCompiler(compiler, options, plugin) {
 
   const useMinify = options.minify;
   if (useMinify === true || (useMinify === 'auto' && isProductionLikeMode)) {
-    /** @type {import('html-minifier-terser').Options} */
-    options.minify = {
-      // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
-      collapseWhitespace: true,
-      keepClosingSlash: true,
-      removeComments: true,
-      removeRedundantAttributes: true,
-      removeScriptTypeAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      useShortDoctype: true,
-    };
+    /**
+     * @type {import('html-minifier-terser').Options}
+     * @see https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
+     */
+    options.minify = Object.assign(
+      {
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true,
+      },
+      typeof options.minify === 'object' ? options.minify : {}
+    );
   }
 
   compiler.hooks.thisCompilation.tap(
