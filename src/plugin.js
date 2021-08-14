@@ -15,10 +15,8 @@ import { isPlainObject, isArray, uniq } from 'lodash';
 import { minify } from 'html-minifier-terser';
 import BasicEffectRulePlugin from 'webpack/lib/rules/BasicEffectRulePlugin';
 import BasicMatcherRulePlugin from 'webpack/lib/rules/BasicMatcherRulePlugin';
-import DescriptionDataMatcherRulePlugin from 'webpack/lib/rules/DescriptionDataMatcherRulePlugin';
 import RuleSetCompiler from 'webpack/lib/rules/RuleSetCompiler';
 import UseEffectRulePlugin from 'webpack/lib/rules/UseEffectRulePlugin';
-import { getCompilationHooks } from 'webpack/lib/NormalModule';
 import { CachedChildCompilation } from './child-compiler';
 import { PrettyError } from './errors';
 import { getHtmlEntryPluginHooks } from './hooks';
@@ -27,6 +25,18 @@ import { isProductionLike } from './utils';
 import { version } from '../package.json';
 
 const NS = 'html-entry-loader';
+
+const objectMatcherRulePlugins = [];
+try {
+  const objectMatcherRulePlugin = require('webpack/lib/rules/ObjectMatcherRulePlugin');
+  objectMatcherRulePlugins.push(
+    new objectMatcherRulePlugin('assert', 'assertions'),
+    new objectMatcherRulePlugin('descriptionData')
+  );
+} catch {
+  const DescriptionDataMatcherRulePlugin = require('webpack/lib/rules/DescriptionDataMatcherRulePlugin');
+  objectMatcherRulePlugins.push(new DescriptionDataMatcherRulePlugin());
+}
 
 const ruleSetCompiler = new RuleSetCompiler([
   new BasicMatcherRulePlugin('test', 'resource'),
@@ -41,7 +51,7 @@ const ruleSetCompiler = new RuleSetCompiler([
   new BasicMatcherRulePlugin('realResource'),
   new BasicMatcherRulePlugin('issuer'),
   new BasicMatcherRulePlugin('compiler'),
-  new DescriptionDataMatcherRulePlugin(),
+  ...objectMatcherRulePlugins,
   new BasicEffectRulePlugin('type'),
   new BasicEffectRulePlugin('sideEffects'),
   new BasicEffectRulePlugin('parser'),
@@ -59,6 +69,10 @@ class HtmlEntryPlugin {
 
   /** @param {WebpackCompiler} compiler */
   apply(compiler) {
+    const { getCompilationHooks } = compiler.webpack
+      ? compiler.webpack.NormalModule
+      : require('webpack/lib/NormalModule');
+
     compiler.hooks.initialize.tap('HtmlEntryPlugin', () => {
       const userOptions = this.userOptions;
 
