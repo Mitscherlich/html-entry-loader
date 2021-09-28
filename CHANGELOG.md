@@ -1,5 +1,13 @@
 # Changelogs
 
+## v0.1.8 (2021-08-14)
+
+- fix: fixup webpack 5.48 compatibility issues.
+
+## v0.1.7 (2021-06-21)
+
+- feat: allow user custom html minify options.
+
 ## v0.1.6 (2021-04-19)
 
 - feat: support hard-source file(s) cache.
