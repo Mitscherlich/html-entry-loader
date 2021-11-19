@@ -154,7 +154,7 @@ export function transform(html, { sources, context, resourcePath }) {
 
     let request = value;
 
-    if (!urlFilter(name, value, options.resourcePath)) {
+    if (!urlFilter(name, value, resourcePath)) {
       continue;
     }
 
