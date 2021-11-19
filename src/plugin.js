@@ -696,7 +696,7 @@ function hookIntoCompiler(compiler, options, plugin) {
             .normalize(
               path.resolve(
                 compilation.options.output.path,
-                dirname(childCompilationOutputName)
+                path.dirname(childCompilationOutputName)
               ),
               compilation.options.output.path
             )
