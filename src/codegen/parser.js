@@ -143,6 +143,7 @@ export function transform(html, { sources, context, resourcePath }) {
 
   for (const source of descriptor.sources) {
     const {
+      name,
       value,
       isValueQuoted,
       format,
@@ -152,6 +153,10 @@ export function transform(html, { sources, context, resourcePath }) {
     } = source;
 
     let request = value;
+
+    if (!urlFilter(name, value, options.resourcePath)) {
+      continue;
+    }
 
     let hash;
     const indexHash = request.lastIndexOf('#');
@@ -212,7 +217,6 @@ export async function compile({
     result = await cache({
       source,
       options,
-      transform,
       cacheDirectory,
       cacheIdentifier,
     });
