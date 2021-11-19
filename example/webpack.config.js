@@ -16,7 +16,9 @@ module.exports = {
     publicPath: '/',
   },
   devServer: {
-    contentBase: r('./dist'),
+    static: {
+      directory: r('./dist'),
+    },
   },
   module: {
     rules: [
